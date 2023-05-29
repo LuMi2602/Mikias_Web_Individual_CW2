@@ -288,6 +288,10 @@
         //array to hold the search of the user
         userSearch: '',
 
+        searchQuery: '',
+        searchResults: [], 
+
+
         searchEmpty: [],
 
         emptyCart: true,
@@ -329,7 +333,33 @@
     },
       methods: {
 
+        async performSearch() {
+    try {
+      const response = await fetch('/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ query: this.searchQuery })
+      });
+      
+      if (response.ok) {
+        this.searchResults = await response.json();
+      } else {
+        console.error('Search request failed:', response.status);
+      }
+    } catch (error) {
+      console.error('Error performing search:', error);
+    }
+  },
+  handleSearchInput() {
+    // Delay the search request by a small amount of time to avoid making requests for each keystroke
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(this.performSearch, 300);
+  },
 
+
+  
         addToCart(lessons) {
           this.cart.push(lessons);
           lessons.Space -= 1
