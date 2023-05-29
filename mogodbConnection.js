@@ -85,11 +85,20 @@ function logger(req, res, next) {
   }
   
   // Static File Middleware
-  app.use('/images', express.static(path.join(__dirname, 'images')));
-
-
-
-
+  // Serve lesson images from the 'images' directory
+app.use('/images', (req, res, next) => {
+  const imagePath = path.join(__dirname, 'images', req.path);
+  
+  fs.access(imagePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      // Image file does not exist
+      res.status(404).send('Image not found');
+    } else {
+      // Image file exists, serve it
+      res.sendFile(imagePath);
+    }
+  });
+});
 
 
 
