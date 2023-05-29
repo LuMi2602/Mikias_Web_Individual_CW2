@@ -4,7 +4,7 @@ let x_classes  = [
     "Image": "Images_For_Subjects/french.jpg",
     "Subject":"French", 
     "Location": "Room 105",
-    "Price": 800 + " AED",
+    "Price": "800 AED",
     "Space": 5
 
        }, 

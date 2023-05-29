@@ -1,0 +1,340 @@
+<html>
+
+<head>
+  <title>Vue.js Individual Work</title>
+
+  <script src="https://unpkg.com/vue"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <script src="x_classes.js"></script>
+
+  <style>
+    body {
+      color: white;
+      font-family: Arial, Helvetica, sans-serif
+    }
+
+    footer {
+
+      color: white;
+    }
+
+    #individual {
+      background-image: url(Images_For_Subjects/scl.jpg);
+      background-size: contain;
+      padding-left: 1.5rem;
+
+    }
+
+    #item {
+
+      text-decoration-color: white;
+      background-color: #212142;
+      max-width: 320px;
+      margin-right: 3rem;
+      margin-top: 1rem;
+
+      margin-bottom: 3rem;
+      padding: 1rem;
+      border: 1px solid #212142;
+      border-radius: 1rem;
+      display: inline-block;
+
+    }
+    
+
+    img {
+      box-sizing: border-box;
+      padding-left: 0%;
+      object-fit: cover;
+      width: 100%;
+      text-decoration-color: aliceblue;
+
+    }
+
+    #searchinput {
+      width: 40%;
+      padding-left: 35%;
+      margin-top: 1rem;
+
+
+    }
+
+    #submit {
+      font-size: medium;
+      position: relative;
+      margin-bottom: 1rem;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div id="individual">
+    <h1 v-text="sitename"></h1>
+    <button :disabled="emptyCart" v-on:click='showCheckout'>
+      {{cartItemCount}}
+      <span class="fas fa-cart-plus"></span> Checkout
+    </button>
+    </header>
+    <main>
+      <div v-if='showProduct'>
+        <!--Radio buttons to help the user choose the type of sorting they want-->
+        <div>
+          <h3>Sort:</h3>
+          <input type="radio" id="subjectSort" value="subjectSort" v-model="sortOption" checked="true">
+          <label for="subjectSort">Sort by Subject</label>
+        </div>
+
+        <div>
+          <input type="radio" id="locationSort" value="locationSort" v-model="sortOption">
+          <label for="locationSort">Sort by Location</label>
+        </div>
+
+        <div>
+          <input type="radio" id="priceSort" value="priceSort" v-model="sortOption">
+          <label for="priceSort">Sort by Price</label>
+        </div>
+
+        <div>
+          <input type="radio" id="availabilitySort" value="availabilitySort" v-model="sortOption">
+          <label for="availabilitySort">Sort by Availability</label>
+        </div>
+
+        <!--Code to allow the user to select where to arrange the items in ascending or 
+            descending order-->
+        <div>
+          <h3>Order By:</h3>
+          <input type="radio" id="asc" value="asc" v-model="sortOption">
+          <label for="asc">Ascending order</label>
+        </div>
+
+        <div>
+          <input type="radio" id="desc" value="desc" v-model="sortOption">
+          <label for="desc">Descending Order</label>
+        </div>
+
+        <!-- searchbox -->
+        <div id="searchinput">
+          <input type="text" placeholder="Search for subjects...." value="searchinput" v-model="userSearch">
+          <label for="searchinput"><strong>Search</strong></label>
+
+        </div>
+
+        
+        <!-- displaying results of the search  -->
+    
+        <div id="item" v-for=" x_classes in SearchFunction ">
+          <img id="img"><img v-bind:src="x_classes.Image"></img>
+          <p v-text="x_classes.Subject"></p>
+          <p>Location : {{x_classes.Location}}</p>
+          <p>Price : {{x_classes.Price}}</p>
+          <p>Available Space:{{ x_classes.Space - cartCount(x_classes.id)}}</p>
+
+          <button v-on:click='addToCart(x_classes)' v-if='canAddToCart(x_classes)'>Add to cart</button>
+          <button disabled="disabled" v-else>Add to cart</button>
+          <!-- <span v-if="x_classes.Space - cartCount(x_classes.id) < 5"> Only {{x_classes.Space - cartItemCount}}
+                  left!</span>
+      
+                <span v-if='x_classes.Space === cartCount(x_classes.id)'>All out!</span>
+                <span v-else>Buy now!</span> -->
+            
+        </div>
+
+        <!--Displaying items sorted by order of Subject upon button selection-->
+        <div v-if="sortOption === 'subjectSort'">
+          <div id="item" v-for=" x_classes in SubjectSort">
+            <img id="img"><img v-bind:src="x_classes.Image"></img>
+            <p v-text="x_classes.Subject"></p>
+            <p>Location : {{x_classes.Location}}</p>
+            <p>Price : {{x_classes.Price}}</p>
+            <p>Available Space:{{ x_classes.Space - cartCount(x_classes.id)}}</p>
+
+            <button v-on:click='addToCart(x_classes)' v-if='canAddToCart(x_classes)'>Add to cart</button>
+            <button disabled="disabled" v-else>Add to cart</button>
+            <!-- <span v-if="x_classes.Space - cartCount(x_classes.id) < 5"> Only {{x_classes.Space - cartItemCount}}
+              left!</span>
+
+            <span v-if='x_classes.Space === cartCount(x_classes.id)'>All out!</span>
+            <span v-else>Buy now!</span> -->
+
+
+          </div>
+
+
+          </br></br>
+        </div>
+
+        <!--Displaying items sorted by order of Location upon radio button selection-->
+        <div v-if="sortOption === 'locationSort'">
+          <div id="item" v-for=" x_classes in LocationSort">
+
+            <img id="img"><img v-bind:src="x_classes.Image"></img>
+
+            <p v-text="x_classes.Subject"></p>
+            <p>Location : {{x_classes.Location}}</p>
+            <p>Price : {{x_classes.Price}}</p>
+            <p>Available Space:{{ x_classes.Space - cartCount(x_classes.id)}}</p>
+
+            <button v-on:click='addToCart(x_classes)' v-if='canAddToCart(x_classes)'>Add to cart</button>
+            <button disabled="disabled" v-else>Add to cart</button>
+
+
+          </div>
+        </div>
+
+        <!--Displaying items sorted by order of Price upon radio button selection-->
+        <div v-if="sortOption === 'priceSort'">
+          <div id="item" v-for=" x_classes in PriceSort">
+            <img id="img"><img v-bind:src="x_classes.Image"></img>
+            <p v-text="x_classes.Subject"></p>
+            <p>Location : {{x_classes.Location}}</p>
+            <p>Price : {{x_classes.Price}}</p>
+            <p>Available Space:{{ x_classes.Space - cartCount(x_classes.id)}}</p>
+
+            <button v-on:click='addToCart(x_classes)' v-if='canAddToCart(x_classes)'>Add to cart</button>
+            <button disabled="disabled" v-else>Add to cart</button>
+
+            <br>
+          </div>
+        </div>
+
+
+        <!--Displaying items sorted by order of Availability upon radio button selection-->
+        <div v-if="sortOption === 'availabilitySort'">
+          <div id="item" v-for=" x_classes in SpaceSort">
+            <img id="img"><img v-bind:src="x_classes.Image"></img>
+            <p v-text="x_classes.Subject"></p>
+            <p>Location : {{x_classes.Location}}</p>
+            <p>Price : {{x_classes.Price}}</p>
+            <p>Available Space:{{ x_classes.Space - cartCount(x_classes.id)}}</p>
+
+            <button v-on:click='addToCart(x_classes)' v-if='canAddToCart(x_classes)'>Add to cart</button>
+            <button disabled="disabled" v-else>Add to cart</button>
+
+          </div>
+        </div>
+
+
+
+        <!--Displaying items in ascending order-->
+        <div v-if="sortOption === 'asc'">
+          <div id="item" v-for=" x_classes in sortedItemsAsc">
+            <img id="img"><img v-bind:src="x_classes.Image"></img>
+            <p v-text="x_classes.Subject"></p>
+            <p>Location : {{x_classes.Location}}</p>
+            <p>Price : {{x_classes.Price}}</p>
+            <p>Available Space:{{ x_classes.Space }}</p>
+
+            <button v-on:click='addToCart(x_classes)' v-if='canAddToCart(x_classes)'>Add to cart</button>
+            <button disabled="disabled" v-else>Add to cart</button>
+
+          </div>
+        </div>
+        <!--Displaying items in descending order-->
+        <div v-if="sortOption === 'desc'">
+          <div id="item" v-for=" x_classes in sortedItemsDesk">
+            <img id="img"><img v-bind:src="x_classes.Image"></img>
+            <p v-text="x_classes.Subject"></p>
+            <p>Location : {{x_classes.Location}}</p>
+            <p>Price : {{x_classes.Price}}</p>
+            <!-- <p>Available Space:{{ x_classes.Space - cartCount(x_classes.id)}}</p> -->
+            <p>Available Space:{{ x_classes.Space }}</p>
+
+            <button v-on:click='addToCart(x_classes)' v-if='canAddToCart(x_classes)'>Add to cart</button>
+            <button disabled="disabled" v-else>Add to cart</button>
+          </div>
+        </div>
+
+
+      </div>
+
+
+      <div v-else>
+        <!-- this is the checkout page -->
+        <h2>Checkout</h2>
+        <p>
+          <strong>First Name:</strong>
+          <input type="text" v-model="inputl" @input="LetterMust">
+        </p>
+
+        <p>
+          <strong>Phone Number:</strong>
+          <input type="text" v-model="Inputn" @input="numberMust">
+        </p>
+
+        <div id="item" v-for=" x_classes in cart">
+          <img id="img"><img v-bind:src="x_classes.Image"></img>
+          <p v-text="x_classes.Subject"></p>
+          <p>Location : {{x_classes.Location}}</p>
+          <p>Price : {{x_classes.Price}}</p>
+          <button v-on:click="removeClass">Remove</button>
+        </div>
+
+      </div id="submit">
+      <!-- <button v-on:click="submitForm">Place Order</button> -->
+      <button id="submit" v-on:click="submitForm" :disabled="isButtonDisabled">Place Order</button>
+  </div>
+
+  <footer>
+    <a
+      href="https://www.freepik.com/free-vector/party-people-silhouette-with-bright-lights_8552295.htm#query=black%20backround%20fun%20activities&position=7&from_view=search&track=ais">
+      Image by kjpargeter</a> on Freepik
+  </footer>
+
+  </main>
+
+  </div>
+
+<script type="text/javascript">
+
+var webstore = new Vue({
+      el: '#individual',
+})
+// Fetch Examples
+
+// Retrieve all lesson with GET
+fetch('/lesson')
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.log(error));
+
+// Save a new order with POST
+const newOrder = {
+name: 'John Doe',
+phoneNumber: '1234567890',
+lessonId: '646a6b62ddf83d022f86b040',
+spaces: 2
+};
+
+fetch('/order', {
+method: 'POST',
+headers: {
+  'Content-Type': 'application/json'
+},
+body: JSON.stringify(newOrder)
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.log(error));
+
+// Update available lesson space with PUT
+const lessonId = '646a6b62ddf83d022f86b040';
+const updatedSpaces = 5;
+
+fetch(`http://localhost:3000/lesson/${lessonId}`, {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ spaces: updatedSpaces })
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.log(error));
+
+ 
+</script>
+</body>
+
+</html>
