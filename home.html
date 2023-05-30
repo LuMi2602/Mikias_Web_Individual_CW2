@@ -116,7 +116,7 @@
 
         <!-- searchbox -->
         <div id="searchinput">
-          <input type="text" placeholder="Search for subjects...." value="searchinput" v-model="userSearch">
+          <input type="text" v-model="searchQuery" @input="handleSearch" placeholder="Search">
           <label for="searchinput"><strong>Search</strong></label>
 
         </div>
@@ -124,14 +124,14 @@
         
         <!-- displaying results of the search  -->
     
-        <div id="item" v-for=" lessons in SearchFunction ">
+        <div id="item" v-for="result in searchResults" :key="result._id">
           <img id="img"><img v-bind:src="x_classes.Image"></img>
-          <p v-text="lessons.Subject"></p>
-          <p>Location : {{lessons.Location}}</p>
-          <p>Price : {{lessons.Price}}</p>
-          <p>Available Space:{{ lessons.Space - cartCount(x_classes.id)}}</p>
+          <p v-text="result.Subject"></p>
+          <p>Location : {{x_classes.Location}}</p>
+          <p>Price : {{x_classes.Price}}</p>
+          <p>Available Space:{{ x_classes.Space - cartCount(x_classes.id)}}</p>
 
-          <button v-on:click='addToCart(x_classes)' v-if='canAddToCart(x_classes)'>Add to cart</button>
+          <button v-on:click='addToCart(lessons)' v-if='canAddToCart(lessons)'>Add to cart</button>
           <button disabled="disabled" v-else>Add to cart</button>
           <!-- <span v-if="x_classes.Space - cartCount(x_classes.id) < 5"> Only {{x_classes.Space - cartItemCount}}
                   left!</span>
@@ -330,35 +330,77 @@
             .catch((error) => {
                 console.error("Error fetching lessons:", error);
             });
+
+            / //   // Fetch Examples
+
+// // // Retrieve all lesson with GET
+fetch('/lesson')
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.log(error));
+
+// Save a new order with POST
+const newOrder = {
+name: 'John Doe',
+phoneNumber: '1234567890',
+lessonId: '646a6b62ddf83d022f86b040',
+spaces: 2
+};
+
+fetch('/order', {
+method: 'POST',
+headers: {
+  'Content-Type': 'application/json'
+},
+body: JSON.stringify(newOrder)
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.log(error));
+console.log(newOrder);
+
+// Update available lesson space with PUT
+const lessonId = '646a6b62ddf83d022f86b040';
+const updatedSpaces = 5;
+
+fetch(`http://localhost:3000/lesson/${lessonId}`, {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ spaces: updatedSpaces })
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.log(error));
+
     },
       methods: {
 
-        async performSearch() {
-    try {
-      const response = await fetch('/search', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ query: this.searchQuery })
-      });
-      
-      if (response.ok) {
-        this.searchResults = await response.json();
-      } else {
-        console.error('Search request failed:', response.status);
-      }
-    } catch (error) {
-      console.error('Error performing search:', error);
+        handleSearch() {
+    const query = this.searchQuery.trim();
+
+    if (query.length === 0) {
+      this.searchResults = [];
+      return;
     }
-  },
-  handleSearchInput() {
-    // Delay the search request by a small amount of time to avoid making requests for each keystroke
-    clearTimeout(this.searchTimeout);
-    this.searchTimeout = setTimeout(this.performSearch, 300);
-  },
 
-
+    fetch('/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ query })
+    })
+    .then((res) => res.json())
+    .then((json) => {
+      this.searchResults = json;
+      console.log(searchResults);
+    })
+    .catch((error) => {
+      console.error('Error performing search:', error);
+    });
+  },
   
         addToCart(lessons) {
           this.cart.push(lessons);
@@ -402,20 +444,20 @@
       //Computed properties
       computed: {
 
-        //function for searching through the lessons
-        SearchFunction() {
-          if (this.userSearch.length > 0) {
+        // //function for searching through the lessons
+        // SearchFunction() {
+        //   if (this.userSearch.length > 0) {
 
-            return this.searchEmpty = this.x_classes.filter(item => {
-              const RegX = new RegExp(this.userSearch, 'i')
-              return RegX.test(item.Subject) || RegX.test(item.Location.toString())
-            })
+        //     return this.searchEmpty = this.x_classes.filter(item => {
+        //       const RegX = new RegExp(this.userSearch, 'i')
+        //       return RegX.test(item.Subject) || RegX.test(item.Location.toString())
+        //     })
 
-          } else {
-            console.log(this.userSearch)
-            this.searchEmpty = []
-          }
-        },
+        //   } else {
+        //     console.log(this.userSearch)
+        //     this.searchEmpty = []
+        //   }
+        // },
 
 
         isButtonDisabled() {

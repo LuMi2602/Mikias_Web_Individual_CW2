@@ -63,6 +63,11 @@ async function connectToMongoDB() {
     const db = client.db(dbName);
     const lessonCollection = db.collection(lessonCollectionName);
     const orderCollection = db.collection(orderCollectionName);
+    
+ // Create text index on 'Subject' field
+ await db.collection('lessonCollection').createIndex({ Subject: 'text' });
+ console.log('Text index created on Subject field');
+
     return { lessonCollection, orderCollection };
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
@@ -152,11 +157,30 @@ app.get('/lesson', async (req, res) => {
   
 
 
+// search
+app.post('/search', async (req, res) => {
+  try {
+    const { query } = req.body;
+
+    const { lessonCollection } = await connectToMongoDB();
+
+    // Perform text search using MongoDB's $text operator
+    const searchResults = await lessonCollection.find(
+      { $text: { $search: query } }
+    ).toArray();
+
+    res.json(searchResults);
+  } catch (error) {
+    console.error('Error performing search:', error);
+    res.sendStatus(500);
+  }
+});
 
 
-//   // Fetch Examples
 
-// // Retrieve all lesson with GET
+// //   // Fetch Examples
+
+// // // Retrieve all lesson with GET
 // fetch('/lesson')
 // .then(response => response.json())
 // .then(data => console.log(data))
