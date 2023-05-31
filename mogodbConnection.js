@@ -7,6 +7,8 @@ const cors = require('cors');
 
 const app = express();
 
+app.use(express.json());
+
 app.use(cors());
 app.use((req,res,next) => {
 
@@ -120,6 +122,8 @@ app.get('/lesson', async (req, res) => {
       res.sendStatus(500);
     }
   });
+
+  
   
   app.post('/order', async (req, res) => {
     try {

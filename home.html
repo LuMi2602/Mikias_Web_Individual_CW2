@@ -326,10 +326,10 @@
             / //   // Fetch Examples
 
 // // // Retrieve all lesson with GET
-fetch('/lesson')
-// .then(response => response.json())
-// .then(data => console.log(data))
-// .catch(error => console.log(error));
+fetch('http://localhost:3000/lesson')
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.log(error));
 
 // Save a new order with POST
 const newOrder = {
@@ -372,7 +372,6 @@ fetch(`http://localhost:3000/lesson/${lessonId}`, {
     const query = this.searchQuery.trim();
 
     if (query.length === 0) {
-      console.log("search recieved");
       this.searchResults = [];
       return;
     }
@@ -387,6 +386,7 @@ fetch(`http://localhost:3000/lesson/${lessonId}`, {
       .then((res) => res.json())
       .then((json) => {
         this.searchResults = json;
+        console.log("search recieved");
         console.log(this.searchResults);
       })
       .catch((error) => {
