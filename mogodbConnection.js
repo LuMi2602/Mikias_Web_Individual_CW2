@@ -162,64 +162,21 @@ app.get('/lesson', async (req, res) => {
 
 
 // search
-app.post('/search', async (req, res) => {
+app.get('/search-lesson/:subject', async (req, res) => {
+  console.log(req.params.subject);
   try {
     const { query } = req.body;
 
     const { lessonCollection } = await connectToMongoDB();
 
     // Perform text search using MongoDB's $text operator
-    const searchResults = await lessonCollection
-      .find({ $text: { $search: query } })
-      .toArray();
-
-    res.json(searchResults);
+    await lessonCollection
+      .findOne({ subject: new RegExp(req.params.subject,'i') },(err,results)=>{
+        console.log(results);
+        res.send(results);
+      })
   } catch (error) {
     console.error('Error performing search:', error);
     res.sendStatus(500);
   }
 });
-
-
-
-// //   // Fetch Examples
-
-// // // Retrieve all lesson with GET
-// fetch('/lesson')
-// .then(response => response.json())
-// .then(data => console.log(data))
-// .catch(error => console.log(error));
-
-// // Save a new order with POST
-// const newOrder = {
-// name: 'John Doe',
-// phoneNumber: '1234567890',
-// lessonId: '646a6b62ddf83d022f86b040',
-// spaces: 2
-// };
-
-// fetch('/order', {
-// method: 'POST',
-// headers: {
-//   'Content-Type': 'application/json'
-// },
-// body: JSON.stringify(newOrder)
-// })
-// .then(response => response.json())
-// .then(data => console.log(data))
-// .catch(error => console.log(error));
-
-// // Update available lesson space with PUT
-// const lessonId = '646a6b62ddf83d022f86b040';
-// const updatedSpaces = 5;
-
-// fetch(`http://localhost:3000/lesson/${lessonId}`, {
-//   method: 'PUT',
-//   headers: {
-//     'Content-Type': 'application/json'
-//   },
-//   body: JSON.stringify({ spaces: updatedSpaces })
-// })
-//   .then(response => response.json())
-//   .then(data => console.log(data))
-//   .catch(error => console.log(error));

@@ -122,7 +122,7 @@
 
         
         <!-- displaying results of the search  -->
-    
+        
         <div id="item" v-for="result in searchResults" :key="result._id">
           <img id="img" :src="result.Image" />
           <p>{{ result.Subject }}</p>
@@ -376,15 +376,10 @@ fetch(`http://localhost:3000/lesson/${lessonId}`, {
       return;
     }
 
-    fetch('/search', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ query })
-    })
+    fetch(`http://localhost:3000/search-lesson/${this.searchQuery}`)
       .then((res) => res.json())
       .then((json) => {
+        console.log(json);
         this.searchResults = json;
         console.log("search recieved");
         console.log(this.searchResults);
