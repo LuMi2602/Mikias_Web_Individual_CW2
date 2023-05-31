@@ -165,9 +165,9 @@ app.post('/search', async (req, res) => {
     const { lessonCollection } = await connectToMongoDB();
 
     // Perform text search using MongoDB's $text operator
-    const searchResults = await lessonCollection.find(
-      { $text: { $search: query } }
-    ).toArray();
+    const searchResults = await lessonCollection
+      .find({ $text: { $search: query } })
+      .toArray();
 
     res.json(searchResults);
   } catch (error) {

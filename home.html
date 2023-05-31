@@ -118,27 +118,19 @@
         <div id="searchinput">
           <input type="text" v-model="searchQuery" @input="handleSearch" placeholder="Search">
           <label for="searchinput"><strong>Search</strong></label>
-
         </div>
 
         
         <!-- displaying results of the search  -->
     
         <div id="item" v-for="result in searchResults" :key="result._id">
-          <img id="img"><img v-bind:src="x_classes.Image"></img>
-          <p v-text="result.Subject"></p>
-          <p>Location : {{x_classes.Location}}</p>
-          <p>Price : {{x_classes.Price}}</p>
-          <p>Available Space:{{ x_classes.Space - cartCount(x_classes.id)}}</p>
-
-          <button v-on:click='addToCart(lessons)' v-if='canAddToCart(lessons)'>Add to cart</button>
+          <img id="img" :src="result.Image" />
+          <p>{{ result.Subject }}</p>
+          <p>Location: {{ result.Location }}</p>
+          <p>Price: {{ result.Price }}</p>
+          <p>Available Space: {{ result.Space - cartCount(result.id) }}</p>
+          <button v-on:click="addToCart(result)" v-if="canAddToCart(result)">Add to cart</button>
           <button disabled="disabled" v-else>Add to cart</button>
-          <!-- <span v-if="x_classes.Space - cartCount(x_classes.id) < 5"> Only {{x_classes.Space - cartItemCount}}
-                  left!</span>
-      
-                <span v-if='x_classes.Space === cartCount(x_classes.id)'>All out!</span>
-                <span v-else>Buy now!</span> -->
-            
         </div>
 
         <!--Displaying items sorted by order of Subject upon button selection-->
@@ -335,9 +327,9 @@
 
 // // // Retrieve all lesson with GET
 fetch('/lesson')
-.then(response => response.json())
-.then(data => console.log(data))
-.catch(error => console.log(error));
+// .then(response => response.json())
+// .then(data => console.log(data))
+// .catch(error => console.log(error));
 
 // Save a new order with POST
 const newOrder = {
@@ -376,11 +368,11 @@ fetch(`http://localhost:3000/lesson/${lessonId}`, {
 
     },
       methods: {
-
         handleSearch() {
     const query = this.searchQuery.trim();
 
     if (query.length === 0) {
+      console.log("search recieved");
       this.searchResults = [];
       return;
     }
@@ -392,14 +384,14 @@ fetch(`http://localhost:3000/lesson/${lessonId}`, {
       },
       body: JSON.stringify({ query })
     })
-    .then((res) => res.json())
-    .then((json) => {
-      this.searchResults = json;
-      console.log(searchResults);
-    })
-    .catch((error) => {
-      console.error('Error performing search:', error);
-    });
+      .then((res) => res.json())
+      .then((json) => {
+        this.searchResults = json;
+        console.log(this.searchResults);
+      })
+      .catch((error) => {
+        console.error('Error performing search:', error);
+      });
   },
   
         addToCart(lessons) {
