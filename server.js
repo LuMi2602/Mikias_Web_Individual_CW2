@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
+const { ObjectId } = require('mongodb');
 
 const app = express();
 
@@ -49,39 +50,50 @@ app.get('/lesson', async (req, res) => {
 });
 
 app.post('/order', async (req, res) => {
-    const result = await db.collection("lesson")
-    const newOrder = {
-      name: req.body.name,
-      phoneNumber: req.body.phoneNumber,
-      lessonId: req.body.lessonId,
-      spaces: req.body.spaces,
-    };
-    result.insertOne(newOrder, (error, result) => {
-      if (error) {
-        console.error('Error saving order:', error);
-        res.sendStatus(500);
-        return;
-      }
-      res.json(result.ops[0]);
-    });
+    const result = await db.collection("order")
+    
+    result.insertOne(req.body).then((result)=>{
+        if (!result["acknowledged"]) {
+            console.error('Error saving order:', error);
+            res.sendStatus(500);
+            return;
+          }
+          res.send(result["insertedId"]);
+    })
+
 });
 
 app.put('/lesson/:id', async (req, res) => {
     const result = await db.collection("lesson");
+    console.log(req.body);
     result.updateOne(
-      { _id: req.params.id },
-      { $set: req.body },
-      (error, result) => {
-        if (error) {
-          console.error('Error updating lesson:', error);
-          res.sendStatus(500);
-          return;
-        }
-        res.json(result);
-      }
-    );
+      { _id: new ObjectId(req.params.id) },
+      { $set: {Space: req.body["space"]} },
+    ).then((result)=>{
+        
+        if (!result["acknowledged"]) {
+            console.error('Error updating lesson:', error);
+            res.sendStatus(500);
+            return;
+          }
+          res.send(result["insertedId"]);
+    })
 });
 
+app.put('/order/:id', async (req, res) => {
+    const result = await db.collection("order");
+    await result.updateOne(
+      { _id: new ObjectId(req.params.id)},
+      { $set: {items: req.body["items"]} },
+    ).then((result)=>{
+        if (!result["acknowledged"]) {
+            console.error('Error updating lesson:', error);
+            res.sendStatus(500);
+            return;
+        }
+        res.send(result);
+    })
+});
 // Search
 app.get('/search-lesson/:subject', async(req, res) => {
     const result = await db.collection("lesson")
